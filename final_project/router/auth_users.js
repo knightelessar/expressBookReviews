@@ -70,6 +70,34 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
     }
 });
 
+// Delete a book review
+regd_users.delete("/auth/review/:isbn", (req, res) => {
+    const isbn = parseInt(req.params.isbn);
+    if (req.session.authorization) {
+        let token = req.session.authorization['accessToken'];
+        let username = req.session.authorization['username'];
+        // Verify JWT token
+        jwt.verify(token, "access", (err, user) => {
+            if (!err) {
+                let book = books[isbn];
+                reviews = book["reviews"];
+                if (username in reviews) {
+                    delete reviews[username];
+                    return res.status(200).json({message: "Review deleted"});
+                } 
+                else {
+                    return res.status(200).json({message: "No review existing"})
+                }
+            } else {
+                return res.status(403).json({ message: "User not authenticated" });
+            }
+        });
+    } else {
+        return res.status(403).json({ message: "User not logged in" });
+    }
+});
+
+
 module.exports.authenticated = regd_users;
 module.exports.isValid = isValid;
 module.exports.users = users;
