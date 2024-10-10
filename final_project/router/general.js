@@ -70,8 +70,14 @@ public_users.get('/title/:title',function (req, res) {
 
 //  Get book review
 public_users.get('/review/:isbn',function (req, res) {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+  const isbn = parseInt(req.params.isbn);
+  if (isbn in books) {
+    let book = books[isbn];
+    return res.status(200).json({message: book["reviews"]});
+  }
+  else {
+    return res.status(300).json({message: `Book isbn ${isbn} is not found`});
+  }
 });
 
 module.exports.general = public_users;
