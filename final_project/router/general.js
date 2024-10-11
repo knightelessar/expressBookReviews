@@ -85,25 +85,42 @@ public_users.get('/isbn/:isbn',function (req, res) {
     })
  });
   
+
+ function getBooksByAuthor(author) {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            let matches = [];
+            let keys = Object.keys(books);
+            keys.forEach((key, i) => {
+              book = books[key];
+              if (author === book.author) {
+                  matches.push(book);
+              }
+            })
+            if (matches.length > 0) {
+                data = matches;
+                resolve(data);
+            }
+            else {
+                reject(`Book not found by author ${author}`);
+            }
+        }, 1000);
+    })
+}
+
+
 // Get book details based on author
 public_users.get('/author/:author',function (req, res) {
-  const author = req.params.author;
-  let matches = [];
-  let keys = Object.keys(books);
-  keys.forEach((key, i) => {
-    book = books[key];
-    if (author === book.author) {
-        matches.push(book);
-    }
-  })
-
-  if (matches.length > 0) {
-    return res.status(200).json({message: JSON.stringify(matches)})
-  }
-  else {
-    return res.status(300).json({message: `No book found by author ${author}`});
-  }
-});
+    const author = req.params.author;
+    getBooksByAuthor(author)
+    .then(data => {
+        res.status(200).json({message: JSON.stringify(data)});
+    })
+    .catch (error => {
+        console.log("Error getting book by author", author, error);
+        res.status(500).json({message: `No book found by author ${author}`})
+    })
+  });
 
 // Get all books based on title
 public_users.get('/title/:title',function (req, res) {
