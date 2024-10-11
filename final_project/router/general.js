@@ -38,11 +38,25 @@ public_users.post("/register", (req,res) => {
     return res.status(404).json({message: "Unable to register user."});
 });
 
+function getBooks() {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            const data = books;
+            resolve(data);
+        }, 1000);
+    })
+}
 // Get the book list available in the shop
 public_users.get('/',function (req, res) {
-    return new Promise((resolve, reject) => {
-        resolve(res.status(200).json({message: JSON.stringify(books)}))
+    getBooks()
+    .then(data => {
+        res.status(200).json({message: JSON.stringify(data)});
     })
+    .catch(error => {
+        console.error('Error getting books', error);
+        res.status(500).send('Internal Server Error');
+    })
+    
 });
 
 // Get book details based on ISBN
