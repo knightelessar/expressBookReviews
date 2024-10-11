@@ -122,25 +122,42 @@ public_users.get('/author/:author',function (req, res) {
     })
   });
 
+  function getBooksByTitle(title) {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            let matches = [];
+            let keys = Object.keys(books);
+            keys.forEach((key, i) => {
+              book = books[key];
+              if (title === book.title) {
+                  matches.push(book);
+              }
+            })
+            if (matches.length > 0) {
+                data = matches;
+                resolve(data);
+            }
+            else {
+                reject(`Book not found by title ${title}`);
+            }
+        }, 1000);
+    })
+}
+
+
 // Get all books based on title
 public_users.get('/title/:title',function (req, res) {
-  const title = req.params.title;
-  let matches = [];
-  let keys = Object.keys(books);
-  keys.forEach((key, i) => {
-    book = books[key];
-    if (title === book.title) {
-        matches.push(book);
-    }
-  })
-
-  if (matches.length > 0) {
-    return res.status(200).json({message: JSON.stringify(matches)})
+    const title = req.params.title;
+    getBooksByTitle(title)
+    .then(data=>{
+        res.status(200).json({message: JSON.stringify(data)})
+    })
+    .catch(error => {
+        console.error("Book not found by title", title, error);
+        res.status(500).json({message: `Book not found by title ${title}`});
+    })
   }
-  else {
-    return res.status(300).json({message: `No book found by title ${title}`});
-  }
-});
+);
 
 //  Get book review
 public_users.get('/review/:isbn',function (req, res) {
